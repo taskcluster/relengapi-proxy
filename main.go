@@ -27,17 +27,13 @@ to a task.
     -h --help                        Show this help screen.
     -p --port <port>                 Port to bind the proxy server to [default: 8080].
     --relengapi-token <token>        The RelengAPI token with which to reate temp tokens [default:].
-    --relengapi-hostname <hostname>  The RelengAPI hostname [default: api.pub.build.mozilla.org].
+	--relengapi-hostname <hostname>  The RelengAPI hostname [default: api.pub.build.mozilla.org].
 `
 
 func main() {
 	arguments, err := docopt.Parse(usage, nil, true, version, false, true)
 	if err != nil {
 		log.Fatalf("%v", err)
-	}
-
-	for k, v := range arguments {
-		log.Println(k, v)
 	}
 
 	taskId := arguments["<taskId>"].(string)
@@ -64,8 +60,13 @@ func main() {
 	}
 
 	relengapiPerms := scopesToPerms(task.Scopes)
+	// TODO tmp
+	relengapiPerms = append(relengapiPerms, "tooltool.download.public")
+	if len(relengapiPerms) == 0 {
+		log.Fatalf("No RelengAPI permission scopes for task (matching '%s*')", ScopePrefix)
+	}
 
-	log.Println("Proxy with scopes:", relengapiPerms, "on port", port)
+	log.Println("Proxying to RelengAPI with permissions:", relengapiPerms, "on port", port)
 	RelengapiProxy{
 		listenPort:     port,
 		targetHostname: relengapiHostname,

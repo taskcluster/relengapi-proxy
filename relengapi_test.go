@@ -42,3 +42,5 @@ func TestScopesToPerms(t *testing.T) {
 		"docker-worker:relengapi-proxy:",
 	}, []string{})
 }
+
+// TODO: test token fetching with httptest
