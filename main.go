@@ -1,15 +1,11 @@
 package main
 
 import (
-	//"fmt"
 	"log"
-	//"net/http"
-	//"os"
 	"strconv"
 
 	docopt "github.com/docopt/docopt-go"
-	// use `taskcluster` from the taskcluster proxy, for getTask
-	tc "github.com/lightsofapollo/taskcluster-proxy/taskcluster"
+	queue "github.com/taskcluster/taskcluster-client-go/queue"
 )
 
 var version = "RelengAPI proxy 1.0"
@@ -28,9 +24,9 @@ to a task.
     ./proxy --help
 
   Options:
-    -h --help                  Show this help screen.
-    -p --port <port>           Port to bind the proxy server to [default: 8080].
-    --relengapi-token <token>  The RelengAPI token with which to reate temp tokens
+    -h --help                  		Show this help screen.
+    -p --port <port>           		Port to bind the proxy server to [default: 8080].
+    --relengapi-token <token>  		The RelengAPI token with which to reate temp tokens
 `
 
 func main() {
@@ -49,14 +45,17 @@ func main() {
 		)
 	}
 
-	// Fetch the task to get the scopes we should be using...
-	task, err := tc.GetTask(taskId)
-
-	if err != nil {
-		log.Fatalf("Could not fetch taskcluster task '%s' : %s", taskId, err)
+	// Fetch the task to get the scopes we should be using.  We don't need auth for this
+	q := queue.New("", "")
+	q.Authenticate = false
+	task, callSummary := q.Task(taskId)
+	if callSummary.Error != nil {
+		log.Fatalf("Could not fetch taskcluster task '%s' : %s", taskId, callSummary.Error)
 	}
 
-	log.Println("Proxy with scopes: ", task.Scopes, " on port ", port)
+	relengapiPerms := scopesToPerms(task.Scopes)
+
+	log.Println("Proxy with scopes:", relengapiPerms, "on port", port)
 	/*
 		routes := Routes{
 			Scopes:      scopes,
