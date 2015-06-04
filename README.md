@@ -11,28 +11,7 @@ and `TASKCLUSTER_ACCESS_TOKEN` environment variables.
 
 ## Examples
 
-For simplicity the below examples use localhost in general this is nicest when
-used with the docker and linking the `taskcluster/proxy` image into it.
-
-```sh
-# Start the server note that 2sz... is the task id
-taskcluster-proxy 2szAy1JzSr6pyjVCdiTcoQ -p 60024
-```
-
-#### Fetch a task
-
-```sh
-curl localhost:60024/v1/task/2szAy1JzSr6pyjVCdiTcoQ
-```
-
-#### Create a signed url for the given task (bewit)
-
-(Note task endpoint is public purely for demonstration)
-
-```sh
-# Returned url will last one hour
-curl localhost:60024/bewit --data 'https://queue.taskcluster.net/v1/task/2szAy1JzSr6pyjVCdiTcoQ'
-```
+TBD
 
 ## Deployment
 
@@ -43,28 +22,28 @@ docker image. [Godep](https://github.com/tools/godep) is required to run
 this script.
 
 ```sh
-./build.sh user/taskcluster-proxy-server
+./build.sh user/relengapi-proxy-server
 ```
 
 ## Download via `go get`
 
+Set up your [GOPATH](https://golang.org/doc/code.html)
+
 ```sh
-go get github.com/lightsofapollo/taskcluster-proxy
+go get github.com/djmitche/relengapi-proxy
 ```
 
 ## Hacking
 
-Follow usual go path setup + godeps.
+To build, just run
 
 ```sh
-# inside the project root which will look something like:
-# $GOPATH/src/github.com/lightsofapollo/taskcluster-proxy
 godep go build
 ```
 
 ## Tests
 
-To run the full test suites you need a [taskcluster auth](http://auth.taskcluster.net/)
-token with at least scopes to the auth server `"auth:*"`. The
-credentials are expected to be in the `TASKCLUSTER_CLIENT_ID` and
-`TASKCLUSTER_ACCESS_TOKEN` environment variables.
+To run the full test suites you need a [RelengAPI](https://api.pub.build.mozilla.org/) token.
+That token must have at least `base.tokens.tmp.issue`, as well as any permissions tasks may need.
+The token is supplied with the --relengapi-token command-line argument.
+Note that credentials must not be included in environment variables!
