@@ -24,13 +24,21 @@ to a task.
     ./proxy --help
 
   Options:
-    -h --help                  		Show this help screen.
-    -p --port <port>           		Port to bind the proxy server to [default: 8080].
-    --relengapi-token <token>  		The RelengAPI token with which to reate temp tokens
+    -h --help                        Show this help screen.
+    -p --port <port>                 Port to bind the proxy server to [default: 8080].
+    --relengapi-token <token>        The RelengAPI token with which to reate temp tokens [default:].
+    --relengapi-hostname <hostname>  The RelengAPI hostname [default: api.pub.build.mozilla.org].
 `
 
 func main() {
 	arguments, err := docopt.Parse(usage, nil, true, version, false, true)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+	for k, v := range arguments {
+		log.Println(k, v)
+	}
 
 	taskId := arguments["<taskId>"].(string)
 	port, err := strconv.Atoi(arguments["--port"].(string))
@@ -38,12 +46,14 @@ func main() {
 		log.Fatalf("Failed to convert port to integer")
 	}
 
-	relengapiToken := arguments["--relengapi-token"]
-	if relengapiToken == nil || relengapiToken == "" {
+	relengapiToken := arguments["--relengapi-token"].(string)
+	if relengapiToken == "" {
 		log.Fatalf(
 			"--relengapi-token is required",
 		)
 	}
+
+	relengapiHostname := arguments["--relengapi-hostname"].(string)
 
 	// Fetch the task to get the scopes we should be using.  We don't need auth for this
 	q := queue.New("", "")
@@ -56,16 +66,10 @@ func main() {
 	relengapiPerms := scopesToPerms(task.Scopes)
 
 	log.Println("Proxy with scopes:", relengapiPerms, "on port", port)
-	/*
-		routes := Routes{
-			Scopes:      scopes,
-			ClientId:    clientId.(string),
-			AccessToken: relengapiToken.(string),
-		}
-
-		startError := http.ListenAndServe(fmt.Sprintf(":%d", port), routes)
-		if startError != nil {
-			log.Fatal(startError)
-		}
-	*/
+	RelengapiProxy{
+		listenPort:     port,
+		targetHostname: relengapiHostname,
+		permissions:    relengapiPerms,
+		issuingToken:   relengapiToken,
+	}.runForever()
 }
