@@ -11,15 +11,22 @@ and `TASKCLUSTER_ACCESS_TOKEN` environment variables.
 
 ## Examples
 
-TBD
+Start the server, giving a relengapi token that can issue temporary tokens and a task ID
+
+    relengapi-proxy --relengapi-token 12341234 2szAy1JzSr6pyjVCdiTcoQ
+
+Once that's running, and assuming a docker alias mapping `relengapi:80` to the proxy,
+
+    curl relengapi/tooltool/sha512/<some-sha512>
+
+to download a file from tooltool, for example.
 
 ## Deployment
 
 The proxy server can be deployed directly by building `proxy/main.go`
 but the prefered method is via the `./build.sh` script which will
 compile the proxy server for linux/amd64 and deploy the server to a
-docker image. [Godep](https://github.com/tools/godep) is required to run
-this script.
+docker image.
 
 ```sh
 ./build.sh user/relengapi-proxy-server
