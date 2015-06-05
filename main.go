@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	docopt "github.com/docopt/docopt-go"
-	queue "github.com/taskcluster/taskcluster-client-go/queue"
 )
 
 var version = "RelengAPI proxy 1.0"
@@ -13,21 +12,21 @@ var usage = `
 RelengAPI authentication proxy.
 
 This attaches a temporary RelengAPI token to all outgoing requests to
-RelengAPI.  The temporary token contains the permissions enumerated by scopes
-matching "relengapi-proxy:permission:<perm>".  The temporary token is generated
-via an HTTP request to RelengAPI using the permanent token given via
---relengapi-token, so any permissions not granted to that token cannot be granted
-to a task.
+RelengAPI.  The temporary token contains the permissions enumerated by task
+scopes matching "docker-worker:relengapi-proxy:<perm>".  The temporary token is
+generated via an HTTP request to RelengAPI using the permanent token given via
+--relengapi-token, so any permissions not granted by that token cannot be
+granted to a task.
 
   Usage:
     ./proxy [options] <taskId>
     ./proxy --help
 
   Options:
-    -h --help                        Show this help screen.
-    -p --port <port>                 Port to bind the proxy server to [default: 8080].
-    --relengapi-token <token>        The RelengAPI token with which to reate temp tokens [default:].
-	--relengapi-hostname <hostname>  The RelengAPI hostname [default: api.pub.build.mozilla.org].
+    -h --help                  Show this help screen.
+    -p --port <port>           Port to bind the proxy server to [default: 8080].
+    --relengapi-token <token>  RelengAPI token with which to reate temp tokens [default:].
+	--relengapi-url <url>  	   RelengAPI URL [default: https://api.pub.build.mozilla.org].
 `
 
 func main() {
@@ -49,28 +48,20 @@ func main() {
 		)
 	}
 
-	relengapiHostname := arguments["--relengapi-hostname"].(string)
+	relengapiUrl := arguments["--relengapi-url"].(string)
 
-	// Fetch the task to get the scopes we should be using.  We don't need auth for this
-	q := queue.New("", "")
-	q.Authenticate = false
-	task, callSummary := q.Task(taskId)
-	if callSummary.Error != nil {
-		log.Fatalf("Could not fetch taskcluster task '%s' : %s", taskId, callSummary.Error)
-	}
+	scopes := getTaskScopes(taskId)
+	relengapiPerms := scopesToPerms(scopes)
 
-	relengapiPerms := scopesToPerms(task.Scopes)
-	// TODO tmp
-	relengapiPerms = append(relengapiPerms, "tooltool.download.public")
 	if len(relengapiPerms) == 0 {
-		log.Fatalf("No RelengAPI permission scopes for task (matching '%s*')", ScopePrefix)
+		log.Fatalf("No RelengAPI permission scopes (matching '%s*') found on task %s",
+			ScopePrefix, taskId)
 	}
 
-	log.Println("Proxying to RelengAPI with permissions:", relengapiPerms, "on port", port)
 	RelengapiProxy{
-		listenPort:     port,
-		targetHostname: relengapiHostname,
-		permissions:    relengapiPerms,
-		issuingToken:   relengapiToken,
+		listenPort:   port,
+		relengapiUrl: relengapiUrl,
+		permissions:  relengapiPerms,
+		issuingToken: relengapiToken,
 	}.runForever()
 }

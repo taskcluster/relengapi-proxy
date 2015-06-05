@@ -9,9 +9,9 @@ import (
 )
 
 type RelengapiProxy struct {
-	listenPort     int
-	targetHostname string
-	permissions    []string
+	listenPort   int
+	relengapiUrl string
+	permissions  []string
 
 	// token used to issue temporary tokens
 	issuingToken string
@@ -33,21 +33,24 @@ func (rp *RelengapiProxy) getToken() string {
 	now := time.Now()
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
-		log.Printf("Generating new temporary token, expires at %v", expires)
-		rp.tmpToken = getTmpToken(rp.targetHostname, rp.issuingToken, expires, rp.permissions)
+		log.Printf("Generating new temporary token; expires at %v", expires)
+		rp.tmpToken = getTmpToken(rp.relengapiUrl, rp.issuingToken, expires, rp.permissions)
 		rp.tmpTokenGoodUntil = expires.Add(-tmpTokenSkew)
 	}
 	return rp.tmpToken
 }
 
 func (rp RelengapiProxy) runForever() {
+	log.Println("Proxying to RelengAPI with permissions:",
+		rp.permissions, "on port", rp.listenPort)
+
 	// httputil's ReverseProxy is not specifically "reverse", and it will
 	// do fine here.  The director transforms outgoing requests.
 	director := func(req *http.Request) {
 		// point toward the upstream server
 		req.URL.Scheme = "https"
-		req.URL.Host = rp.targetHostname
-		req.Host = rp.targetHostname
+		req.URL.Host = rp.relengapiUrl
+		req.Host = rp.relengapiUrl
 		// Add the token
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", rp.getToken()))
 		// log
