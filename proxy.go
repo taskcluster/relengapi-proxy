@@ -29,7 +29,7 @@ const tmpTokenLifetime time.Duration = 10 * time.Minute
 // renew a little bit early to account for clock skew, etc.
 const tmpTokenSkew time.Duration = 10 * time.Second
 
-func (rp *RelengapiProxy) getToken() string {
+func (rp *RelengapiProxy) getToken() (string, error) {
 	now := time.Now()
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
@@ -37,12 +37,12 @@ func (rp *RelengapiProxy) getToken() string {
 		tok, err := getTmpToken(
 			rp.relengapiUrl, rp.issuingToken, expires, rp.permissions)
 		if err != nil {
-			log.Fatal(err) // TODO
+			return "", err
 		}
 		rp.tmpToken = tok
 		rp.tmpTokenGoodUntil = expires.Add(-tmpTokenSkew)
 	}
-	return rp.tmpToken
+	return rp.tmpToken, nil
 }
 
 func (rp RelengapiProxy) runForever() {
@@ -57,7 +57,15 @@ func (rp RelengapiProxy) runForever() {
 		req.URL.Host = rp.relengapiUrl
 		req.Host = rp.relengapiUrl
 		// Add the token
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", rp.getToken()))
+		tok, err := rp.getToken()
+		if err != nil {
+			// ReverseProxy does not provide a way to short-circuit the
+			// proxying and return an error response to the caller.  Anyway, if
+			// we failed to get a token then the task is probably a complete
+			// loss anyway.  So bail out.
+			log.Fatal(err)
+		}
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", tok))
 		// log
 		log.Println(req.Method, req.URL)
 	}
