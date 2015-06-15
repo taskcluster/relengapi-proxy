@@ -43,14 +43,15 @@ func main() {
 
 	relengapiToken := arguments["--relengapi-token"].(string)
 	if relengapiToken == "" {
-		log.Fatalf(
-			"--relengapi-token is required",
-		)
+		log.Fatal("--relengapi-token is required")
 	}
 
 	relengapiUrl := arguments["--relengapi-url"].(string)
 
-	scopes := getTaskScopes(taskId)
+	scopes, err := getTaskScopes(taskId)
+	if err != nil {
+		log.Fatalf("Could not fetch taskcluster task '%s' : %s", taskId, err)
+	}
 	relengapiPerms := scopesToPerms(scopes)
 
 	if len(relengapiPerms) == 0 {
