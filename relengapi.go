@@ -3,9 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -41,7 +41,7 @@ type relengapiTokenJson struct {
 	Token       string      `json:"token,omitempty"`
 }
 
-func getTmpToken(url string, issuingToken string, expires time.Time, perms []string) string {
+func getTmpToken(url string, issuingToken string, expires time.Time, perms []string) (tok string, err error) {
 	// TODO: retry this operation
 	request := relengapiTokenJson{
 		Typ:         "tmp",
@@ -52,40 +52,42 @@ func getTmpToken(url string, issuingToken string, expires time.Time, perms []str
 
 	reqbody, err := json.Marshal(request)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	client := &http.Client{}
 	reqUrl := fmt.Sprintf("%s/tokenauth/tokens", url)
 	req, err := http.NewRequest("POST", reqUrl, bytes.NewBuffer(reqbody))
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", issuingToken))
 	resp, err := client.Do(req)
-
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	if resp.StatusCode != 200 {
-		log.Fatalf("Got '%s' while trying to get new tmp token:\n%s",
-			resp.Status, string(body))
+		err = errors.New(fmt.Sprintf(
+			"Got '%s' while trying to get new tmp token:\n%s",
+			resp.Status, string(body)))
+		return
 	}
 
 	var responseBody interface{}
 	err = json.Unmarshal(body, &responseBody)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 
 	result := responseBody.(map[string]interface{})["result"]
-	tok := result.(map[string]interface{})["token"].(string)
-	return tok
+	tok = result.(map[string]interface{})["token"].(string)
+	return
 }

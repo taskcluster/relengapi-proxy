@@ -34,7 +34,12 @@ func (rp *RelengapiProxy) getToken() string {
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
-		rp.tmpToken = getTmpToken(rp.relengapiUrl, rp.issuingToken, expires, rp.permissions)
+		tok, err := getTmpToken(
+			rp.relengapiUrl, rp.issuingToken, expires, rp.permissions)
+		if err != nil {
+			log.Fatal(err) // TODO
+		}
+		rp.tmpToken = tok
 		rp.tmpTokenGoodUntil = expires.Add(-tmpTokenSkew)
 	}
 	return rp.tmpToken
