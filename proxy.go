@@ -9,9 +9,9 @@ import (
 )
 
 type RelengapiProxy struct {
-	listenPort   int
-	relengapiUrl string
-	permissions  []string
+	listenPort    int
+	relengapiHost string
+	permissions   []string
 
 	// token used to issue temporary tokens
 	issuingToken string
@@ -35,7 +35,7 @@ func (rp *RelengapiProxy) getToken() (string, error) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
 		tok, err := getTmpToken(
-			rp.relengapiUrl, rp.issuingToken, expires, rp.permissions)
+			rp.relengapiHost, rp.issuingToken, expires, rp.permissions)
 		if err != nil {
 			return "", err
 		}
@@ -54,8 +54,8 @@ func (rp RelengapiProxy) runForever() {
 	director := func(req *http.Request) {
 		// point toward the upstream server
 		req.URL.Scheme = "https"
-		req.URL.Host = rp.relengapiUrl
-		req.Host = rp.relengapiUrl
+		req.URL.Host = rp.relengapiHost
+		req.Host = rp.relengapiHost
 		// Add the token
 		tok, err := rp.getToken()
 		if err != nil {

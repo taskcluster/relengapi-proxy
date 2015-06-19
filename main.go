@@ -26,7 +26,7 @@ granted to a task.
     -h --help                  Show this help screen.
     -p --port <port>           Port to bind the proxy server to [default: 8080].
     --relengapi-token <token>  RelengAPI token with which to reate temp tokens [default:].
-	--relengapi-url <url>  	   RelengAPI URL [default: https://api.pub.build.mozilla.org].
+	--relengapi-host <url> 	   RelengAPI hostname [default: api.pub.build.mozilla.org].
 `
 
 func main() {
@@ -46,7 +46,7 @@ func main() {
 		log.Fatal("--relengapi-token is required")
 	}
 
-	relengapiUrl := arguments["--relengapi-url"].(string)
+	relengapiHost := arguments["--relengapi-host"].(string)
 
 	scopes, err := getTaskScopes(taskId)
 	if err != nil {
@@ -60,9 +60,9 @@ func main() {
 	}
 
 	RelengapiProxy{
-		listenPort:   port,
-		relengapiUrl: relengapiUrl,
-		permissions:  relengapiPerms,
-		issuingToken: relengapiToken,
+		listenPort:    port,
+		relengapiHost: relengapiHost,
+		permissions:   relengapiPerms,
+		issuingToken:  relengapiToken,
 	}.runForever()
 }
