@@ -5,9 +5,15 @@ individual tasks to talk to various taskcluster services (auth, queue,
 scheduler) without hardcoding credentials into the containers
 themselves.
 
-Credentials are expected to be passed via the `TASKCLUSTER_CLIENT_ID`
-and `TASKCLUSTER_ACCESS_TOKEN` environment variables.
+This works by creating a temporary RelengAPI access token bearing the
+permissions specified for the task.  Permissions are specified as scopes, with
+the prefix `docker-worker:relengapi-proxy:`.  For example, the
+`tooltool.download.internal` permission will be available if the task has scope
+`docker-worker:relengapi-proxy:tooltool.download.internal`.  Note that `*`
+cannot be used to get all relengapi permissions.
 
+The temporary token is requested using a permanent token known only to the proxy, given
+on the command line with `--relengapi-token`.
 
 ## Examples
 
