@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/taskcluster/httpbackoff"
 )
 
 const ScopePrefix = "docker-worker:relengapi-proxy:"
@@ -42,7 +44,6 @@ type relengapiTokenJson struct {
 }
 
 func getTmpToken(hostname string, issuingToken string, expires time.Time, perms []string) (tok string, err error) {
-	// TODO: retry this operation
 	request := relengapiTokenJson{
 		Typ:         "tmp",
 		Expires:     &expires,
@@ -63,7 +64,7 @@ func getTmpToken(hostname string, issuingToken string, expires time.Time, perms 
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", issuingToken))
-	resp, err := client.Do(req)
+	resp, _, err := httpbackoff.ClientDo(client, req)
 	if err != nil {
 		return
 	}
