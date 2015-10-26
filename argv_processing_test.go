@@ -28,27 +28,34 @@ func TestUnknownParameter(t *testing.T) {
 	}
 }
 
-// using correct syntax should be ok
+// using correct syntax should be ok for an arbitrary taskId
 func TestValidCommand(t *testing.T) {
-	argv := []string{"--relengapi-token", "345", "--", "TRZquWniSYmYHlZn_-kLAw"}
-	_, err := parseProgramArgs(argv, false)
+	validCommand(t, "TRZquWniSYmYHlZn_-kLAw")
+}
+
+// specifying taskId starting with `-` works
+func TestLeadingHyphenInTaskId(t *testing.T) {
+	validCommand(t, "-RZquWniSYmYHlZn_-kLAw")
+}
+
+// utility function to check that a valid command is ok for a given taskId
+func validCommand(t *testing.T, taskId string) {
+	argv := []string{"--relengapi-token", "345", "--", taskId}
+	arguments, err := parseProgramArgs(argv, false)
 	if err != nil {
 		t.Fatalf("Expected args %s to be ok, but got error: %s", argv, err)
+	}
+	if arguments["<taskId>"] == nil {
+		t.Fatalf("No taskId returned")
+	}
+	if val := arguments["<taskId>"].(string); val != taskId {
+		t.Fatalf("Expected taskId to be %s but was %s", taskId, val)
 	}
 }
 
 // adding optional parameters works
 func TestOptionalParams(t *testing.T) {
 	argv := []string{"--relengapi-token", "345", "--port", "678", "--relengapi-host", "pretend-host", "--", "TRZquWniSYmYHlZn_-kLAw"}
-	_, err := parseProgramArgs(argv, false)
-	if err != nil {
-		t.Fatalf("Expected args %s to be ok, but got error: %s", argv, err)
-	}
-}
-
-// specifying taskId starting with `-` works
-func TestLeadingHyphenInTaskId(t *testing.T) {
-	argv := []string{"--relengapi-token", "345", "--", "-RZquWniSYmYHlZn_-kLAw"}
 	_, err := parseProgramArgs(argv, false)
 	if err != nil {
 		t.Fatalf("Expected args %s to be ok, but got error: %s", argv, err)
