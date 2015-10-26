@@ -5,66 +5,58 @@ individual tasks to talk to various taskcluster services (auth, queue,
 scheduler) without hardcoding credentials into the containers
 themselves.
 
-Credentials are expected to be passed via the `TASKCLUSTER_CLIENT_ID`
-and `TASKCLUSTER_ACCESS_TOKEN` environment variables.
+This works by creating a temporary RelengAPI access token bearing the
+permissions specified for the task.  Permissions are specified as scopes, with
+the prefix `docker-worker:relengapi-proxy:`.  For example, the
+`tooltool.download.internal` permission will be available if the task has scope
+`docker-worker:relengapi-proxy:tooltool.download.internal`.  Note that `*`
+cannot be used to get all relengapi permissions.
 
+The temporary token is requested using a permanent token known only to the proxy, given
+on the command line with `--relengapi-token`.
 
 ## Examples
 
-For simplicity the below examples use localhost in general this is nicest when
-used with the docker and linking the `taskcluster/proxy` image into it.
+Start the server, giving a relengapi token that can issue temporary tokens and a task ID
 
-```sh
-# Start the server note that 2sz... is the task id
-taskcluster-proxy 2szAy1JzSr6pyjVCdiTcoQ -p 60024
-```
+    relengapi-proxy --relengapi-token 12341234 2szAy1JzSr6pyjVCdiTcoQ
 
-#### Fetch a task
+Once that's running, and assuming a docker alias mapping `relengapi:80` to the proxy,
 
-```sh
-curl localhost:60024/v1/task/2szAy1JzSr6pyjVCdiTcoQ
-```
+    curl relengapi/tooltool/sha512/<some-sha512>
 
-#### Create a signed url for the given task (bewit)
-
-(Note task endpoint is public purely for demonstration)
-
-```sh
-# Returned url will last one hour
-curl localhost:60024/bewit --data 'https://queue.taskcluster.net/v1/task/2szAy1JzSr6pyjVCdiTcoQ'
-```
+to download a file from tooltool, for example.
 
 ## Deployment
 
 The proxy server can be deployed directly by building `proxy/main.go`
 but the prefered method is via the `./build.sh` script which will
 compile the proxy server for linux/amd64 and deploy the server to a
-docker image. [Godep](https://github.com/tools/godep) is required to run
-this script.
+docker image.
 
 ```sh
-./build.sh user/taskcluster-proxy-server
+./build.sh user/relengapi-proxy-server
 ```
 
 ## Download via `go get`
 
+Set up your [GOPATH](https://golang.org/doc/code.html)
+
 ```sh
-go get github.com/lightsofapollo/taskcluster-proxy
+go get github.com/djmitche/relengapi-proxy
 ```
 
 ## Hacking
 
-Follow usual go path setup + godeps.
+To build, just run
 
 ```sh
-# inside the project root which will look something like:
-# $GOPATH/src/github.com/lightsofapollo/taskcluster-proxy
 godep go build
 ```
 
 ## Tests
 
-To run the full test suites you need a [taskcluster auth](http://auth.taskcluster.net/)
-token with at least scopes to the auth server `"auth:*"`. The
-credentials are expected to be in the `TASKCLUSTER_CLIENT_ID` and
-`TASKCLUSTER_ACCESS_TOKEN` environment variables.
+To run the full test suites you need a [RelengAPI](https://api.pub.build.mozilla.org/) token.
+That token must have at least `base.tokens.tmp.issue`, as well as any permissions tasks may need.
+The token is supplied with the --relengapi-token command-line argument.
+Note that credentials must not be included in environment variables!

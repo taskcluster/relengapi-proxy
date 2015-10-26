@@ -1,36 +1,39 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
-	"os"
 	"strconv"
 
 	docopt "github.com/docopt/docopt-go"
-	tc "github.com/lightsofapollo/taskcluster-proxy/taskcluster"
 )
 
-var version = "Taskcluster proxy 1.0"
+var version = "RelengAPI proxy 1.0"
 var usage = `
-Taskcluster authentication proxy. By default this pulls all scopes from a
-particular task but additional scopes may be added by specifying them after the
-task id.
+RelengAPI authentication proxy.
+
+This attaches a temporary RelengAPI token to all outgoing requests to
+RelengAPI.  The temporary token contains the permissions enumerated by task
+scopes matching "docker-worker:relengapi-proxy:<perm>".  The temporary token is
+generated via an HTTP request to RelengAPI using the permanent token given via
+--relengapi-token, so any permissions not granted by that token cannot be
+granted to a task.
 
   Usage:
-    ./proxy [options] <taskId> [<scope>...]
+    ./proxy [options] <taskId>
     ./proxy --help
 
   Options:
-    -h --help                       Show this help screen.
-    -p --port <port>                Port to bind the proxy server to [default: 8080].
-    --client-id <clientId>          Use a specific auth.taskcluster hawk client	id [default: ].
-    --access-token <accessToken>    Use a specific auth.taskcluster hawk access	token. [default: ]
+    -h --help                  Show this help screen.
+    -p --port <port>           Port to bind the proxy server to [default: 8080].
+    --relengapi-token <token>  RelengAPI token with which to reate temp tokens [default:].
+	--relengapi-host <url> 	   RelengAPI hostname [default: api.pub.build.mozilla.org].
 `
 
 func main() {
-	// Parse the docopt string and exit on any error or help message.
 	arguments, err := docopt.Parse(usage, nil, true, version, false, true)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
 
 	taskId := arguments["<taskId>"].(string)
 	port, err := strconv.Atoi(arguments["--port"].(string))
@@ -38,55 +41,28 @@ func main() {
 		log.Fatalf("Failed to convert port to integer")
 	}
 
-	// Parse out additional scopes to add...
-	var additionalScopes []string
-	if arguments["<scope>"] != nil {
-		additionalScopes = arguments["<scope>"].([]string)
-	} else {
-		additionalScopes = make([]string, 0)
+	relengapiToken := arguments["--relengapi-token"].(string)
+	if relengapiToken == "" {
+		log.Fatal("--relengapi-token is required")
 	}
 
-	// Client is is required but has a default.
-	clientId := arguments["--client-id"]
-	if clientId == nil || clientId == "" {
-		clientId = os.Getenv("TASKCLUSTER_CLIENT_ID")
-	}
+	relengapiHost := arguments["--relengapi-host"].(string)
 
-	// Access token is also required but has a default.
-	accessToken := arguments["--access-token"]
-	if accessToken == nil || accessToken == "" {
-		accessToken = os.Getenv("TASKCLUSTER_ACCESS_TOKEN")
-	}
-
-	log.Printf("%v - %v", clientId, accessToken)
-
-	// Ensure we have credentials our auth proxy is pretty much useless without
-	// it.
-	if accessToken == "" || clientId == "" {
-		log.Fatalf(
-			"Credentials must be passed via environment variables or flags...",
-		)
-	}
-
-	// Fetch the task to get the scopes we should be using...
-	task, err := tc.GetTask(taskId)
-
+	scopes, err := getTaskScopes(taskId)
 	if err != nil {
 		log.Fatalf("Could not fetch taskcluster task '%s' : %s", taskId, err)
 	}
+	relengapiPerms := scopesToPerms(scopes)
 
-	scopes := append(additionalScopes, task.Scopes...)
-
-	log.Println("Proxy with scopes: ", scopes)
-
-	routes := Routes{
-		Scopes:      scopes,
-		ClientId:    clientId.(string),
-		AccessToken: accessToken.(string),
+	if len(relengapiPerms) == 0 {
+		log.Fatalf("No RelengAPI permission scopes (matching '%s*') found on task %s",
+			ScopePrefix, taskId)
 	}
 
-	startError := http.ListenAndServe(fmt.Sprintf(":%d", port), routes)
-	if startError != nil {
-		log.Fatal(startError)
-	}
+	RelengapiProxy{
+		listenPort:    port,
+		relengapiHost: relengapiHost,
+		permissions:   relengapiPerms,
+		issuingToken:  relengapiToken,
+	}.runForever()
 }
