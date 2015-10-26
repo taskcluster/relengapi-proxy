@@ -19,7 +19,7 @@ on the command line with `--relengapi-token`.
 
 Start the server, giving a relengapi token that can issue temporary tokens and a task ID
 
-    relengapi-proxy --relengapi-token 12341234 2szAy1JzSr6pyjVCdiTcoQ
+    relengapi-proxy --relengapi-token 12341234 -- 2szAy1JzSr6pyjVCdiTcoQ
 
 Once that's running, and assuming a docker alias mapping `relengapi:80` to the proxy,
 
