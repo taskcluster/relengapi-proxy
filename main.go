@@ -7,7 +7,7 @@ import (
 	docopt "github.com/docopt/docopt-go"
 )
 
-var version = "RelengAPI proxy 1.0"
+var version = "RelengAPI proxy 2.0.0"
 var usage = `
 RelengAPI authentication proxy.
 
@@ -19,9 +19,9 @@ generated via an HTTP request to RelengAPI using the permanent token given via
 granted to a task.
 
   Usage:
-    ./proxy [options] -- <taskId>
-    ./proxy -h|--help
-    ./proxy --version
+    relengapi-proxy [options] -- <taskId>
+    relengapi-proxy -h|--help
+    relengapi-proxy --version
 
   Options:
     -h --help                  Show this help screen.
