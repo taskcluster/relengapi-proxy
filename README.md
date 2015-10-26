@@ -43,7 +43,7 @@ docker image.
 Set up your [GOPATH](https://golang.org/doc/code.html)
 
 ```sh
-go get github.com/djmitche/relengapi-proxy
+go get github.com/taskcluster/relengapi-proxy
 ```
 
 ## Hacking
