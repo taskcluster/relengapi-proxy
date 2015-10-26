@@ -7,7 +7,7 @@ import (
 	docopt "github.com/docopt/docopt-go"
 )
 
-var version = "RelengAPI proxy 1.0"
+var version = "RelengAPI proxy 2.0.0"
 var usage = `
 RelengAPI authentication proxy.
 
@@ -19,34 +19,51 @@ generated via an HTTP request to RelengAPI using the permanent token given via
 granted to a task.
 
   Usage:
-    ./proxy [options] <taskId>
-    ./proxy --help
+    relengapi-proxy [options] -- <taskId>
+    relengapi-proxy -h|--help
+    relengapi-proxy --version
 
   Options:
     -h --help                  Show this help screen.
+    --version                  Show version.
     -p --port <port>           Port to bind the proxy server to [default: 8080].
-    --relengapi-token <token>  RelengAPI token with which to reate temp tokens [default:].
-	--relengapi-host <url> 	   RelengAPI hostname [default: api.pub.build.mozilla.org].
+    --relengapi-token <token>  RelengAPI token with which to create temp tokens [default:].
+    --relengapi-host <url>     RelengAPI hostname [default: api.pub.build.mozilla.org].
 `
 
 func main() {
+
 	arguments, err := docopt.Parse(usage, nil, true, version, false, true)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
 
-	taskId := arguments["<taskId>"].(string)
-	port, err := strconv.Atoi(arguments["--port"].(string))
-	if err != nil {
-		log.Fatalf("Failed to convert port to integer")
+	// treat nil (arg not provided) the same as an empty string (arg provided
+	// but was empty string)
+	fetchArg := func(argName string) (argValue string) {
+		argValueInterface := arguments[argName]
+		if argValueInterface != nil {
+			argValue = argValueInterface.(string)
+		}
+		return argValue
 	}
 
-	relengapiToken := arguments["--relengapi-token"].(string)
+	taskId := fetchArg("<taskId>")
+	if taskId == "" {
+		log.Fatal("--task-id is required")
+	}
+
+	port, err := strconv.Atoi(fetchArg("--port"))
+	if err != nil {
+		log.Fatalf("Failed to convert port to integer (value supplied: %s)", arguments["--port"])
+	}
+
+	relengapiToken := fetchArg("--relengapi-token")
 	if relengapiToken == "" {
 		log.Fatal("--relengapi-token is required")
 	}
 
-	relengapiHost := arguments["--relengapi-host"].(string)
+	relengapiHost := fetchArg("--relengapi-host")
 
 	scopes, err := getTaskScopes(taskId)
 	if err != nil {
