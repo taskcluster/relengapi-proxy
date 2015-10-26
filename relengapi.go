@@ -43,7 +43,7 @@ type relengapiTokenJson struct {
 	Token       string      `json:"token,omitempty"`
 }
 
-func getTmpToken(hostname string, issuingToken string, expires time.Time, perms []string) (tok string, err error) {
+func getTmpToken(urlPrefix string, issuingToken string, expires time.Time, perms []string) (tok string, err error) {
 	request := relengapiTokenJson{
 		Typ:         "tmp",
 		Expires:     &expires,
@@ -57,7 +57,7 @@ func getTmpToken(hostname string, issuingToken string, expires time.Time, perms 
 	}
 
 	client := &http.Client{}
-	reqUrl := fmt.Sprintf("https://%s/tokenauth/tokens", hostname)
+	reqUrl := fmt.Sprintf("%s/tokenauth/tokens", urlPrefix)
 	req, err := http.NewRequest("POST", reqUrl, bytes.NewBuffer(reqbody))
 	if err != nil {
 		return

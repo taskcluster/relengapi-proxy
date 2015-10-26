@@ -34,8 +34,9 @@ func (rp *RelengapiProxy) getToken() (string, error) {
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
+		urlPrefix := fmt.Sprintf("https://%s", rp.relengapiHost)
 		tok, err := getTmpToken(
-			rp.relengapiHost, rp.issuingToken, expires, rp.permissions)
+			urlPrefix, rp.issuingToken, expires, rp.permissions)
 		if err != nil {
 			return "", err
 		}
