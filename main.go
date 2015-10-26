@@ -32,8 +32,7 @@ granted to a task.
 `
 
 func main() {
-
-	arguments, err := docopt.Parse(usage, nil, true, version, false, true)
+	arguments, err := parseProgramArgs(nil, true)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
@@ -82,4 +81,8 @@ func main() {
 		permissions:   relengapiPerms,
 		issuingToken:  relengapiToken,
 	}.runForever()
+}
+
+func parseProgramArgs(argv []string, exit bool) (map[string]interface{}, error) {
+	return docopt.Parse(usage, argv, true, version, false, exit)
 }
