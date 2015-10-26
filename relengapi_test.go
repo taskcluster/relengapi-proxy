@@ -106,10 +106,11 @@ func makeFakeServer(exp_expires time.Time, exp_perms []string, err_response bool
 		// build the response, eschewing json.Marshal and just supplying the text
 		w.Header().Add("Content-Type", "application/json")
 		if err_response {
-			w.WriteHeader(500)
+			// note that 5xx errors will be retried via httpbackoff
+			w.WriteHeader(499)
 			fmt.Fprintf(w, `{
 				"error": {
-					"code": 500,
+					"code": 499,
 					"description": "BOOM"
 				}
 			}`)
