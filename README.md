@@ -1,9 +1,8 @@
-# Taskcluster Proxy
+# RelEngAPI Proxy
 
 This is the proxy server which is used in the docker-worker which allows
 individual tasks to talk to various taskcluster services (auth, queue,
-scheduler) without hardcoding credentials into the containers
-themselves.
+scheduler) without hardcoding credentials into the containers themselves.
 
 This works by creating a temporary RelengAPI access token bearing the
 permissions specified for the task.  Permissions are specified as scopes, with
@@ -12,8 +11,8 @@ the prefix `docker-worker:relengapi-proxy:`.  For example, the
 `docker-worker:relengapi-proxy:tooltool.download.internal`.  Note that `*`
 cannot be used to get all relengapi permissions.
 
-The temporary token is requested using a permanent token known only to the proxy, given
-on the command line with `--relengapi-token`.
+The temporary token is requested using a permanent token known only to the
+proxy, given on the command line with `--relengapi-token`.
 
 ## Examples
 
@@ -29,10 +28,9 @@ to download a file from tooltool, for example.
 
 ## Deployment
 
-The proxy server can be deployed directly by building `proxy/main.go`
-but the prefered method is via the `./build.sh` script which will
-compile the proxy server for linux/amd64 and deploy the server to a
-docker image.
+The proxy server can be deployed directly by building and running the package,
+but the prefered method is via the `./build.sh` script which will compile the
+proxy server for linux/amd64 and deploy the server to a docker image.
 
 ```sh
 ./build.sh user/relengapi-proxy-server
@@ -43,7 +41,7 @@ docker image.
 Set up your [GOPATH](https://golang.org/doc/code.html)
 
 ```sh
-go get github.com/djmitche/relengapi-proxy
+go get github.com/taskcluster/relengapi-proxy
 ```
 
 ## Hacking
@@ -51,12 +49,15 @@ go get github.com/djmitche/relengapi-proxy
 To build, just run
 
 ```sh
-godep go build
+go build
 ```
 
 ## Tests
 
-To run the full test suites you need a [RelengAPI](https://api.pub.build.mozilla.org/) token.
-That token must have at least `base.tokens.tmp.issue`, as well as any permissions tasks may need.
-The token is supplied with the --relengapi-token command-line argument.
+To run the full test suites you need a
+[RelengAPI](https://api.pub.build.mozilla.org/) token.  
+That token must have at least `base.tokens.tmp.issue`, as well as any
+permissions tasks may need.  
+The token is supplied with the --relengapi-token
+command-line argument.  
 Note that credentials must not be included in environment variables!
