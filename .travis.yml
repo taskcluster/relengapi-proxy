@@ -1,3 +1,18 @@
 language: go
 go:
   - 1.4
+
+# encrpyt channel name to get around issue
+# https://github.com/travis-ci/travis-ci/issues/1094
+notifications:
+  irc:
+    channels:
+      # encrpyted string was "irc.mozilla.org#taskcluster-bots"
+      - secure: "gMTfYMpFZFUlMHy0f+U1pOxLDbupIRsPHL707NVfgf/czBIoHC7nuMlNIrNQO+h8er5/fzkjBVrmBlfiF/5WF3RgR8fUzkdW5BqxjGI4kZxsZPRJcyXv6RxN9Nv7KeYcB9yJhHIGZfzh9BY+J16g1reXDO2wB/NI66PY8Sm2/oXnxrz46U6qVMXZWSOCS3kAwL4XoVoEwQ43/c31fLC6dyud49MZZa6E43zBZ+j6LM64w2xa05lIaObnG8VP8JTEoUOzLIK4EoOU0x2mg39RKgq6617LN7525r/nusXwIweL0gMI+H9gqXTC4d1TvxHLAYjpVQsArZIJn4wNWnTWwMQV+V6OV0z8RJZ01nVmvFOLJuWAcsgCDZRIEYHwDL1S7Jw2j3Rd883pWrKb5Cd/XlvqOEbySqb0ukRYIk4QLUGol8EyWMGZTxT6Jj+MVly6OaW6tIHaHePW4M9udGcdEUOJ4MQNlCE4fhiGZNZyzBM7JanEBK3cq7/ZCm60tw6ciVHFry9anWUH5pFs1K06G5UuAZfOMRpvkUlt4m6HT36emwHZ4DMf3HlP/PTEldT6m/zvJRSb59nfZjebPOcbsU0Nm6bXF9S5wLKM5t0qKp5qS4Y0bfGC2+HoZaz3XmtzHmPagnmXFMUM877J/JAupGYL/m2/2FINT61AnDeWhvw="
+    on_success: change
+    on_failure: always
+    template:
+      - "%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}"
+      - "Change view : %{compare_url}"
+      - "Build details : %{build_url}"
+      - "Commit message : %{commit_message}"
