@@ -1,8 +1,6 @@
 package main
 
-import (
-	"testing"
-)
+import "testing"
 
 // at least one argument must be specified
 func TestCommandParser(t *testing.T) {
