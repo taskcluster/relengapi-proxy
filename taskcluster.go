@@ -12,7 +12,7 @@ func getTaskScopes(taskId string) ([]string, error) {
 	)
 	q.Authenticate = false
 
-	task, _, err := q.Task(taskId)
+	task, err := q.Task(taskId)
 	if err != nil {
 		return nil, err
 	}
