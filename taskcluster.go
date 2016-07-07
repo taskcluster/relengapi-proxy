@@ -1,8 +1,8 @@
 package main
 
 import (
-	queue "github.com/taskcluster/taskcluster-client-go/queue"
-	"github.com/taskcluster/taskcluster-client-go/tcclient"
+	tcclient "github.com/taskcluster/taskcluster-client-go"
+	"github.com/taskcluster/taskcluster-client-go/queue"
 )
 
 func getTaskScopes(taskId string) ([]string, error) {
