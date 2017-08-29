@@ -92,7 +92,7 @@ func makeFakeServer(exp_expires time.Time, exp_perms []string, err_response bool
 		if len(perms) != len(exp_perms) {
 			log.Fatal("Did not get expected number of perms")
 		}
-		for i, _ := range perms {
+		for i := range perms {
 			if perms[i] != exp_perms[i] {
 				log.Fatalf("did not get correct permission %d", i)
 			}
