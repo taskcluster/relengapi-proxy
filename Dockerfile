@@ -1,8 +1,7 @@
-FROM ubuntu:14.04
+FROM scratch
 MAINTAINER Dustin J. Mitchell <dustin@mozilla.com>
 
-RUN apt-get update
-RUN apt-get install -y ca-certificates
 EXPOSE 80
 COPY target/relengapi-proxy /relengapi-proxy
+COPY target/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 ENTRYPOINT ["/relengapi-proxy", "--port", "80"]
