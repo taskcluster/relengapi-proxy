@@ -38,6 +38,8 @@ proxy server for linux/amd64 and deploy the server to a docker image.
 
 ## Download via `go get`
 
+__You will need at least go 1.7__. A newer version of go 1.x is also ok.
+
 Set up your [GOPATH](https://golang.org/doc/code.html)
 
 ```sh
