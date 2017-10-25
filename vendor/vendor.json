@@ -63,6 +63,12 @@
 			"revisionTime": "2014-09-15T17:57:00Z"
 		},
 		{
+			"checksumSHA1": "jQ0wltHJ4nQ63Q+8Z6x0qhG91q4=",
+			"path": "github.com/theckman/goconstraint/go1.8/gte",
+			"revision": "b481d8dfc9f409b57fe73890cb4294b69376c4ae",
+			"revisionTime": "2017-08-28T09:24:44Z"
+		},
+		{
 			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
 			"path": "golang.org/x/net/context",
 			"revision": "66aacef3dd8a676686c7ae3716979581e8b03c47",
