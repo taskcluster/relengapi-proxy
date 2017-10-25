@@ -1,0 +1,73 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "hFFFYFqtS10h1arNtLUo2MmkYZE=",
+			"path": "github.com/cenkalti/backoff",
+			"revision": "61153c768f31ee5f130071d08fc82b85208528de",
+			"revisionTime": "2017-07-11T19:02:43Z"
+		},
+		{
+			"checksumSHA1": "F+YOz/6ymsuIxUy511OAdxjyhRI=",
+			"path": "github.com/docopt/docopt-go",
+			"revision": "784ddc588536785e7299f7272f39101f7faccc3f",
+			"revisionTime": "2016-02-16T23:20:12Z"
+		},
+		{
+			"checksumSHA1": "kR64D1QzAOSM9LHOnTPdbigC8q0=",
+			"path": "github.com/fatih/camelcase",
+			"revision": "f6a740d52f961c60348ebb109adde9f4635d7540",
+			"revisionTime": "2016-03-18T18:15:35Z"
+		},
+		{
+			"checksumSHA1": "Se195FlZ160eaEk/uVx4KdTPSxU=",
+			"path": "github.com/pborman/uuid",
+			"revision": "e790cca94e6cc75c7064b1332e63811d4aae1a53",
+			"revisionTime": "2017-06-12T15:36:48Z"
+		},
+		{
+			"checksumSHA1": "bEZ/qOAGG6/dU0rftPVi83OoMfk=",
+			"path": "github.com/taskcluster/httpbackoff",
+			"revision": "0f98dc52a5c86fc4d4868dfbf262b7b1dec6e30b",
+			"revisionTime": "2017-08-29T17:26:11Z"
+		},
+		{
+			"checksumSHA1": "OjDDbqgfyuGxyrLToBL8qutLMYw=",
+			"path": "github.com/taskcluster/jsonschema2go/text",
+			"revision": "af4f3c500d169674ce3ba7bac98bfee68b2da245",
+			"revisionTime": "2017-06-29T11:59:52Z"
+		},
+		{
+			"checksumSHA1": "mmT+MBkTM4iJ+djqEQd36B4QoC8=",
+			"path": "github.com/taskcluster/slugid-go/slugid",
+			"revision": "3c9ae46f3d508a76a3c91d804fb48bf4ffef48e8",
+			"revisionTime": "2017-01-12T10:02:13Z"
+		},
+		{
+			"checksumSHA1": "5u9WU3AUybtfZRnqITFs91k3HeM=",
+			"path": "github.com/taskcluster/taskcluster-client-go",
+			"revision": "0adb988569ffd40f68ed3422835325cfb03581c5",
+			"revisionTime": "2017-07-06T18:25:07Z"
+		},
+		{
+			"checksumSHA1": "2ejtALFm/1HFJnQNZ1km6luvmB8=",
+			"path": "github.com/taskcluster/taskcluster-client-go/queue",
+			"revision": "0adb988569ffd40f68ed3422835325cfb03581c5",
+			"revisionTime": "2017-07-06T18:25:07Z"
+		},
+		{
+			"checksumSHA1": "Jggs+SsefVhBtVaWOqlFnsXICkk=",
+			"path": "github.com/tent/hawk-go",
+			"revision": "8bd4a9f3b4cf4a535303c3f5ce3811475764139c",
+			"revisionTime": "2014-09-15T17:57:00Z"
+		},
+		{
+			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
+			"path": "golang.org/x/net/context",
+			"revision": "66aacef3dd8a676686c7ae3716979581e8b03c47",
+			"revisionTime": "2016-09-14T00:11:54Z"
+		}
+	],
+	"rootPath": "github.com/taskcluster/relengapi-proxy"
+}
