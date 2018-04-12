@@ -1,13 +1,10 @@
 package main
 
-import (
-	"github.com/taskcluster/taskcluster-client-go/queue"
-)
+import "github.com/taskcluster/taskcluster-client-go/tcqueue"
 
 func getTaskScopes(taskId string) ([]string, error) {
 	// We do not need auth for this operation
-	q := queue.NewNoAuth()
-
+	q := tcqueue.New(nil)
 	task, err := q.Task(taskId)
 	if err != nil {
 		return nil, err
