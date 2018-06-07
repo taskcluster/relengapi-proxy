@@ -54,20 +54,20 @@ func (rp RelengapiProxy) runForever() {
 	// httputil's ReverseProxy is not specifically "reverse", and it will
 	// do fine here.  The director transforms outgoing requests.
 	director := func(req *http.Request) {
-        // redirect tooltool traffic to tooltool.mozilla-releng.net
+        // redirect tooltool traffic to tooltool.staging.mozilla-releng.net
         if strings.HasPrefix(req.URL.Path, "/tooltool") {
             req.URL.Scheme = "https"
             req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tooltool")
             req.URL.RawPath = ""
-            req.URL.Host = "tooltool.mozilla-releng.net"
-            req.Host = "tooltool.mozilla-releng.net"
-        // redirect treestatus traffic to treestatus.mozilla-releng.net
+            req.URL.Host = "tooltool.staging.mozilla-releng.net"
+            req.Host = "tooltool.staging.mozilla-releng.net"
+        // redirect treestatus traffic to treestatus.staging.mozilla-releng.net
         } else if strings.HasPrefix(req.URL.Path, "/treestatus") {
             req.URL.Scheme = "https"
             req.URL.Path = strings.TrimPrefix(req.URL.Path, "/treestatus")
             req.URL.RawPath = ""
-            req.URL.Host = "treestatus.mozilla-releng.net"
-            req.Host = "treestatus.mozilla-releng.net"
+            req.URL.Host = "treestatus.staging.mozilla-releng.net"
+            req.Host = "treestatus.staging.mozilla-releng.net"
         // other services then tooltool and treestatus/tooltool are still using
         // old url. once all services are migrated to new url then we will clean
         // up this and make this function more generic
