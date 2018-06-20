@@ -7,7 +7,7 @@ import (
 	docopt "github.com/docopt/docopt-go"
 )
 
-var version = "RelengAPI proxy 2.2.0"
+var version = "RelengAPI proxy 2.3.0"
 var usage = `
 RelengAPI authentication proxy.
 
