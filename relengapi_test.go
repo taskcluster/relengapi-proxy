@@ -137,7 +137,7 @@ func TestGetTmpToken(t *testing.T) {
 	ts := makeFakeServer(expires, perms, false)
 	defer ts.Close()
 
-	tok, err := getTmpToken(ts.URL, "iss-tok", expires, perms)
+	tok, err := getTmpToken("iss-tok", expires, perms)
 
 	if err != nil {
 		t.Fatal(err)
@@ -154,7 +154,7 @@ func TestGetTmpTokenFails(t *testing.T) {
 	ts := makeFakeServer(expires, perms, true)
 	defer ts.Close()
 
-	tok, err := getTmpToken(ts.URL, "iss-tok", expires, perms)
+	tok, err := getTmpToken("iss-tok", expires, perms)
 
 	if err == nil {
 		t.Fatal("didn't get error")
