@@ -57,8 +57,8 @@ func makeFakeServer(exp_expires time.Time, exp_perms []string, err_response bool
 		if r.Method != "POST" {
 			log.Fatal("request method is not POST")
 		}
-		if r.URL.Path != "/tokenauth/tokens" {
-			log.Fatal("request path is not /tokenauth/tokens")
+		if r.URL.Path != "/" {
+			log.Fatal("request path is not /")
 		}
 		if r.Header.Get("Authorization") != "Bearer iss-tok" {
 			log.Fatalf("Authorization header not set correctly (%s)",
@@ -126,7 +126,7 @@ func makeFakeServer(exp_expires time.Time, exp_perms []string, err_response bool
 
 	// set up a fake relengapi server
 	servemux := http.NewServeMux()
-	servemux.HandleFunc("/tokenauth/tokens", serveHttp)
+	servemux.HandleFunc("/", serveHttp)
 	return httptest.NewServer(servemux)
 }
 
@@ -137,7 +137,7 @@ func TestGetTmpToken(t *testing.T) {
 	ts := makeFakeServer(expires, perms, false)
 	defer ts.Close()
 
-	tok, err := getTmpToken("iss-tok", expires, perms)
+	tok, err := getTmpToken(ts.URL, "iss-tok", expires, perms)
 
 	if err != nil {
 		t.Fatal(err)
@@ -154,7 +154,7 @@ func TestGetTmpTokenFails(t *testing.T) {
 	ts := makeFakeServer(expires, perms, true)
 	defer ts.Close()
 
-	tok, err := getTmpToken("iss-tok", expires, perms)
+	tok, err := getTmpToken(ts.URL, "iss-tok", expires, perms)
 
 	if err == nil {
 		t.Fatal("didn't get error")

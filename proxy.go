@@ -35,7 +35,7 @@ func (rp *RelengapiProxy) getToken() (string, error) {
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
-		tok, err := getTmpToken(rp.issuingToken, expires, rp.permissions)
+		tok, err := getTmpToken("https://tokens.mozilla-releng.net", rp.issuingToken, expires, rp.permissions)
 		if err != nil {
 			return "", err
 		}
