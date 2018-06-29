@@ -28,7 +28,7 @@ granted to a task.
     --version                  Show version.
     -p --port <port>           Port to bind the proxy server to [default: 8080].
     --relengapi-token <token>  RelengAPI token with which to create temp tokens [default:].
-    --relengapi-host <url>     RelengAPI hostname [default: api.pub.build.mozilla.org].
+    --relengapi-host <url>     RelengAPI hostname [default: mozilla-releng.net].
 `
 
 func main() {

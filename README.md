@@ -57,7 +57,7 @@ go build
 ## Tests
 
 To run the full test suites you need a
-[RelengAPI](https://api.pub.build.mozilla.org/) token.  
+[RelengAPI token](https://mozilla-releng.net/tokens).  
 That token must have at least `base.tokens.tmp.issue`, as well as any
 permissions tasks may need.  
 The token is supplied with the --relengapi-token

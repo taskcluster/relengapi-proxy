@@ -56,20 +56,23 @@ func (rp RelengapiProxy) runForever() {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tooltool")
 			req.URL.RawPath = ""
-			req.URL.Host = "tooltool.mozilla-releng.net"
-			req.Host = "tooltool.mozilla-releng.net"
+            host := fmt.Sprintf("tooltool.%s", p.config.relengapiHost)
+			req.URL.Host = host
+			req.Host = host
 		} else if strings.HasPrefix(req.URL.Path, "/treestatus") {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/treestatus")
 			req.URL.RawPath = ""
-			req.URL.Host = "treestatus.mozilla-releng.net"
-			req.Host = "treestatus.mozilla-releng.net"
+            host := fmt.Sprintf("treestatus.%s", p.config.relengapiHost)
+			req.URL.Host = host
+			req.Host = host
 		} else if strings.HasPrefix(req.URL.Path, "/mapper") {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/mapper")
 			req.URL.RawPath = ""
-			req.URL.Host = "mapper.mozilla-releng.net"
-			req.Host = "mapper.mozilla-releng.net"
+            host := fmt.Sprintf("mapper.%s", p.config.relengapiHost)
+			req.URL.Host = host
+			req.Host = host
 		} else {
 			log.Fatal("Non exising service was requested.")
 			return
