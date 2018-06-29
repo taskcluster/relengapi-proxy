@@ -35,7 +35,7 @@ func (rp *RelengapiProxy) getToken() (string, error) {
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
-		tok, err := getTmpToken("https://tokens.mozilla-releng.net", rp.issuingToken, expires, rp.permissions)
+		tok, err := getTmpToken("https://tokens.mozilla-releng.net/tokens", rp.issuingToken, expires, rp.permissions)
 		if err != nil {
 			return "", err
 		}
@@ -52,30 +52,28 @@ func (rp RelengapiProxy) runForever() {
 	// httputil's ReverseProxy is not specifically "reverse", and it will
 	// do fine here.  The director transforms outgoing requests.
 	director := func(req *http.Request) {
-        // redirect tooltool traffic to tooltool.mozilla-releng.net
-        if strings.HasPrefix(req.URL.Path, "/tooltool") {
-            req.URL.Scheme = "https"
-            req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tooltool")
-            req.URL.RawPath = ""
-            req.URL.Host = "tooltool.mozilla-releng.net"
-            req.Host = "tooltool.mozilla-releng.net"
-        // redirect treestatus traffic to treestatus.mozilla-releng.net
-        } else if strings.HasPrefix(req.URL.Path, "/treestatus") {
-            req.URL.Scheme = "https"
-            req.URL.Path = strings.TrimPrefix(req.URL.Path, "/treestatus")
-            req.URL.RawPath = ""
-            req.URL.Host = "treestatus.mozilla-releng.net"
-            req.Host = "treestatus.mozilla-releng.net"
-        // other services then tooltool and treestatus/tooltool are still using
-        // old url. once all services are migrated to new url then we will clean
-        // up this and make this function more generic
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=1393648
-        } else {
-            // point toward the upstream server
-            req.URL.Scheme = "https"
-            req.URL.Host = rp.relengapiHost
-            req.Host = rp.relengapiHost
-        }
+		if strings.HasPrefix(req.URL.Path, "/tooltool") {
+			req.URL.Scheme = "https"
+			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tooltool")
+			req.URL.RawPath = ""
+			req.URL.Host = "tooltool.mozilla-releng.net"
+			req.Host = "tooltool.mozilla-releng.net"
+		} else if strings.HasPrefix(req.URL.Path, "/treestatus") {
+			req.URL.Scheme = "https"
+			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/treestatus")
+			req.URL.RawPath = ""
+			req.URL.Host = "treestatus.mozilla-releng.net"
+			req.Host = "treestatus.mozilla-releng.net"
+		} else if strings.HasPrefix(req.URL.Path, "/mapper") {
+			req.URL.Scheme = "https"
+			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/mapper")
+			req.URL.RawPath = ""
+			req.URL.Host = "mapper.mozilla-releng.net"
+			req.Host = "mapper.mozilla-releng.net"
+		} else {
+			log.Fatal("Non exising service was requested.")
+			return
+		}
 		// Add the token
 		tok, err := rp.getToken()
 		if err != nil {
