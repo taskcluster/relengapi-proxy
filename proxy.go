@@ -35,7 +35,7 @@ func (rp *RelengapiProxy) getToken() (string, error) {
 	if now.After(rp.tmpTokenGoodUntil) {
 		expires := now.Add(tmpTokenLifetime)
 		log.Printf("Generating new temporary token; expires at %v", expires)
-        url := fmt.Sprintf("https://.%s/tokens", rp.relengapiHost)
+		url := fmt.Sprintf("https://tokens.%s/tokens", rp.relengapiHost)
 		tok, err := getTmpToken(url, rp.issuingToken, expires, rp.permissions)
 		if err != nil {
 			return "", err
@@ -57,21 +57,21 @@ func (rp RelengapiProxy) runForever() {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/tooltool")
 			req.URL.RawPath = ""
-            host := fmt.Sprintf("tooltool.%s", rp.relengapiHost)
+			host := fmt.Sprintf("tooltool.%s", rp.relengapiHost)
 			req.URL.Host = host
 			req.Host = host
 		} else if strings.HasPrefix(req.URL.Path, "/treestatus") {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/treestatus")
 			req.URL.RawPath = ""
-            host := fmt.Sprintf("treestatus.%s", rp.relengapiHost)
+			host := fmt.Sprintf("treestatus.%s", rp.relengapiHost)
 			req.URL.Host = host
 			req.Host = host
 		} else if strings.HasPrefix(req.URL.Path, "/mapper") {
 			req.URL.Scheme = "https"
 			req.URL.Path = strings.TrimPrefix(req.URL.Path, "/mapper")
 			req.URL.RawPath = ""
-            host := fmt.Sprintf("mapper.%s", rp.relengapiHost)
+			host := fmt.Sprintf("mapper.%s", rp.relengapiHost)
 			req.URL.Host = host
 			req.Host = host
 		} else {
