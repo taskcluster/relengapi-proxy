@@ -1,8 +1,9 @@
 # RelEngAPI Proxy
 
 This is the proxy server which is used in the docker-worker which allows
-individual tasks to talk to various taskcluster services (auth, queue,
-scheduler) without hardcoding credentials into the containers themselves.
+individual tasks to talk to [Releng
+API](https://github.com/mozilla/build-relengapi) without hardcoding credentials
+into the containers themselves.
 
 This works by creating a temporary RelengAPI access token bearing the
 permissions specified for the task.  Permissions are specified as scopes, with
@@ -13,6 +14,12 @@ cannot be used to get all relengapi permissions.
 
 The temporary token is requested using a permanent token known only to the
 proxy, given on the command line with `--relengapi-token`.
+
+__Note, relengapi-proxy can currently only run on https://taskcluster.net !!__
+
+If other taskcluster deployment environments need to be supported, the
+hardcoded reference to this `rootURL` should be removed from the code, and the
+rootURL should be provided as an additional required command line parameter.
 
 ## Examples
 
